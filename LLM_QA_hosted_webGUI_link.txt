@@ -1,4 +1,4 @@
 Name: Callista Mbene
 Matric number: 22CD032163
-Live URL of hosted application: https://<your-hosted-app-url>
+Live URL of hosted application: https://llm-qa-project-mbene-callista-22cd032163-gf4s.onrender.com
 GitHub repository link: https://github.com/callista-mbene/LLM_QA_Project_MBENE-CALLISTA_22CD032163

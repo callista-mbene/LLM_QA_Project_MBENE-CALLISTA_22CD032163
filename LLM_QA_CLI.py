@@ -17,32 +17,24 @@ def preprocess_question(question):
 def query_llm(question, api_key):
     try:
         genai.configure(api_key=api_key)
-
-        # FIXED: updated model name
-        model = genai.GenerativeModel("gemini-1.5-pro-latest")
-
+        # Use the correct Gemini model
+        model = genai.GenerativeModel("gemini-2.0-flash")
         response = model.generate_content(question)
-        
-        # sometimes the response may not contain .text
-        if hasattr(response, "text"):
-            return response.text
-        else:
-            return str(response)
-
+        # Check if response has .text
+        return getattr(response, "text", str(response))
     except Exception as e:
         return f"Error: {str(e)}"
 
 def main():
     print("=" * 60)
-    print("NLP Question-and-Answering System Using LLM API")
+    print("NLP Question-and-Answering System Using Gemini API")
     print("=" * 60)
-    print()
     
     api_key = os.environ.get("GEMINI_API_KEY")
     
     if not api_key:
         print("Error: GEMINI_API_KEY environment variable not set.")
-        print("Please set it using: export GEMINI_API_KEY='your-api-key'")
+        print("Please set it in your environment before running this script.")
         return
     
     while True:
@@ -64,7 +56,7 @@ def main():
         print(f"Processed Question: {processed_question}")
         print(f"Tokens: {tokens}")
         
-        print("\n[Querying LLM API...]")
+        print("\n[Querying Gemini API...]")
         answer = query_llm(processed_question, api_key)
         
         print("\n" + "=" * 60)

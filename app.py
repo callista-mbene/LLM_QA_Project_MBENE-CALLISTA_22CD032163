@@ -14,9 +14,9 @@ def preprocess_question(question):
 def query_llm(question, api_key):
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-pro-latest')
+        model = genai.GenerativeModel("gemini-2.0-flash")
         response = model.generate_content(question)
-        return response.text
+        return getattr(response, "text", str(response))
     except Exception as e:
         return f"Error: {str(e)}"
 
@@ -26,26 +26,29 @@ def home():
 
 @app.route('/ask', methods=['POST'])
 def ask():
-    data = request.json
-    question = data.get('question', '').strip()
-    
-    if not question:
-        return jsonify({'error': 'Please enter a valid question'}), 400
-    
-    api_key = os.environ.get("GEMINI_API_KEY")
-    
-    if not api_key:
-        return jsonify({'error': 'API key not configured'}), 500
-    
-    processed_question, tokens = preprocess_question(question)
-    answer = query_llm(question, api_key)
-    
-    return jsonify({
-        'original_question': question,
-        'processed_question': processed_question,
-        'tokens': tokens,
-        'answer': answer
-    })
+    try:
+        data = request.json
+        question = data.get('question', '').strip()
+        
+        if not question:
+            return jsonify({'error': 'Please enter a valid question'}), 400
+        
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if not api_key:
+            return jsonify({'error': 'API key not configured'}), 500
+        
+        processed_question, tokens = preprocess_question(question)
+        answer = query_llm(processed_question, api_key)
+        
+        return jsonify({
+            'original_question': question,
+            'processed_question': processed_question,
+            'tokens': tokens,
+            'answer': answer
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
+genai.configure(api_key="AIzaSyDB1WX5IuZ45b2DHVD5RvxDSEcELHI043Q")
